@@ -1,0 +1,20 @@
+{
+  "include": ["src"],
+  "compilerOptions": {
+    "target": "es6",
+    "module": "CommonJS",
+    "allowJs": true,
+    "strict": false,
+    "strictPropertyInitialization": false,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "sourceMap": true,
+    "outDir": "build",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

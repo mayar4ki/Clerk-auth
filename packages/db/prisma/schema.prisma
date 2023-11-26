@@ -1,0 +1,256 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+
+model User {
+    id       String    @id @default(cuid())
+
+    first_name          String?
+    last_name          String?
+    image_url         String?
+    gender        String?
+
+    notifications Notification[]
+    devices       Device[]
+    wallet        Wallet?
+    createdCurrencies  Currency[]
+
+    receivedFriendRequests FriendRequest[] @relation("to")
+    sentFriendRequests  FriendRequest[] @relation("from")
+
+    receivedServices ServiceRequest[] @relation("consumer")
+    providedServices  ServiceRequest[] @relation("provider")
+
+}
+
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model Notification {
+    id            String    @id @default(cuid())
+
+    title          String
+    body          String?
+    link          String?
+
+    userId       String?
+    user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)  
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    seenAt DateTime 
+}
+
+model Device {
+    id            String    @id @default(cuid())
+
+    token          String   
+    type          String 
+
+    userId       String?
+    user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)   
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt 
+}
+
+enum FriendRequestStatus {
+   PENDING
+   ACCEPTED
+}
+
+model FriendRequest {
+    id            String    @id @default(cuid())
+
+    from    User @relation("from", fields: [fromId], references: [id])
+    fromId  String
+
+    to   User @relation("to", fields: [toId], references: [id])
+    toId String
+
+    status  FriendRequestStatus  @default(PENDING)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt 
+}
+
+
+model Wallet {
+    id            String    @id @default(cuid())
+
+    color         String    @default("#000000")
+
+    userId       String @unique
+    user         User     @relation(fields: [userId], references: [id]) 
+
+    currencies  Currency[]
+
+    inTransaction Transaction[] @relation("to")
+    outTransaction  Transaction[] @relation("from")
+}
+
+model CurrencyType  {
+    id            String    @id @default(cuid())
+
+    name       String @unique
+    description       String @unique
+
+    values Value[]
+
+    currencies Currency[]
+    services CurrencyTypesOnServices[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt 
+}
+
+model Value  {
+    id        String    @id @default(cuid())
+
+    value Float
+
+    currencyTypeId       String 
+    currencyType      CurrencyType     @relation(fields: [currencyTypeId], references: [id]) 
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt 
+    
+}
+
+model Currency  {
+    id            String    @id @default(cuid())
+
+    walletId String
+    wallet Wallet @relation(fields: [walletId], references: [id])  
+
+    makerId       String?
+    maker         User?     @relation(fields: [makerId], references: [id], onDelete: Cascade)  
+
+    currencyTypeId       String 
+    currencyType      CurrencyType     @relation(fields: [currencyTypeId], references: [id]) 
+
+    transactions CurrenciesOnTransactions[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt 
+}
+
+model Transaction  {
+    id            String    @id @default(cuid())
+
+    from    Wallet @relation("from", fields: [fromId], references: [id])
+    fromId  String
+
+    to   Wallet @relation("to", fields: [toId], references: [id])
+    toId String
+
+    currencies  CurrenciesOnTransactions[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt 
+}
+
+model CurrenciesOnTransactions  {
+
+    currencyId       String 
+    currency      Currency     @relation(fields: [currencyId], references: [id])
+
+    transactionId       String 
+    transaction     Transaction     @relation(fields: [transactionId], references: [id]) 
+
+    createdAt DateTime @default(now())
+
+     @@id([currencyId, transactionId])
+}
+
+model Service  {
+    id            String    @id @default(cuid())
+
+    title String
+    description       String @unique
+    image String?
+
+    price CurrencyTypesOnServices[]
+    categories CategoriesOnServices[]
+
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt 
+}
+
+
+model Category {
+    id            String    @id @default(cuid())
+
+    name String
+
+    services CategoriesOnServices[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt 
+}
+
+model CategoriesOnServices {
+    categoryId       String 
+    category      Category     @relation(fields: [categoryId], references: [id])
+
+    serviceId       String 
+    service     Service     @relation(fields: [serviceId], references: [id]) 
+
+
+    createdAt DateTime @default(now())
+
+     @@id([categoryId, serviceId])
+}
+
+model CurrencyTypesOnServices {
+    currencyTypeId       String 
+    currencyType      CurrencyType     @relation(fields: [currencyTypeId], references: [id])
+
+    serviceId       String 
+    service     Service     @relation(fields: [serviceId], references: [id]) 
+
+    count Int
+
+    createdAt DateTime @default(now())
+
+     @@id([currencyTypeId, serviceId])
+}
+
+enum ServiceRequestStatus {
+   PENDING
+   ACCEPTED
+   REJECTED
+}
+
+model ServiceRequest {
+    id            String    @id @default(cuid())
+
+    provider    User @relation("provider", fields: [providerId], references: [id])
+    providerId  String
+
+    consumer   User @relation("consumer", fields: [consumerId], references: [id])
+    consumerId String
+
+    status  ServiceRequestStatus  @default(PENDING)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt 
+}
+

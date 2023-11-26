@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "RobotoCondensedBold";
+  src: local("RobotoCondensedBold"),
+    url("/assets/fonts/RobotoCondensed-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "RobotoCondensedRegular";
+  src: local("RobotoCondensedRegular"),
+    url("/assets/fonts/RobotoCondensed-Regular.ttf") format("truetype");
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow: overlay;
+}
+
+/*   ScrollBar Style */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  border-radius: 50px;
+}
+::-webkit-scrollbar-track {
+  background-color: #e2e2e2;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #e7266077;
+  border-radius: 15px;
+}
