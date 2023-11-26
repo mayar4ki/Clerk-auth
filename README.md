@@ -27,6 +27,9 @@ apps
   |   ├─ Navigation using Expo Router
   |   ├─ Tailwind using Nativewind
   |   └─ Typesafe API calls using tRPC
+  ├─  express
+  |   ├─ Webhook
+  |   └─ E2E Typesafe API Server
   └─ next.js
       ├─ Next.js 13
       ├─ React 18
@@ -35,8 +38,8 @@ apps
 packages
  ├─ api
  |   └─ tRPC v10 router definition
- ├─ auth
-     └─ authentication using next-auth. **NOTE: Only for Next.js app, not Expo**
+ ├─ webhook
+ |   └─ svix webhook for Clerk auth 
  └─ db
      └─ typesafe db-calls using Prisma
 ```
